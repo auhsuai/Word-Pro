@@ -1,5 +1,4 @@
 {
-  "version": "1.6.2",
+  "version": "1.7.0",
   "download_url": "https://github.com/auhsuai/Word-Pro/releases/download/v1.6.0/WordPro_Setup.exe",
-  "changelog": "- Phiên bản 1.6.2 chính thức.\n- Việt hóa 100% trình cài đặt.\n- Mã hóa bảo mật mã nguồn bằng PyArmor.\n- Thêm tính năng kiểm tra cập nhật online."
-}
+  "changelog": "- Làm mới giao diện Lịch sử.\n- Biểu đồ WPM theo từng từ.\n- Xem lại biểu đồ các phiên cũ.\n- Sửa lỗi hết giờ sớm.\n- Sửa lỗi cửa sổ đè nhau.\n- Căn chỉnh lại cột trong bảng."
