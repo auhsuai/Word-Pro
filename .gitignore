@@ -1,0 +1,10 @@
+__pycache__/
+build/
+dist/
+obfuscated/
+Installer/
+WordPro.exe
+unins000.*
+user_stats.json
+custom_sentences.json
+*.spec
