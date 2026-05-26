@@ -13,3 +13,7 @@ build_all.bat
 release.py
 setup.iss
 WordPro_Setup.exe
+*.log
+pyarmor.bug.log
+pyarmor/
+
