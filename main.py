@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox  
 import customtkinter as ctk
 import time
 import random
@@ -24,7 +23,7 @@ from updater import UpdaterMixin
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-VERSION = "1.8.1"
+VERSION = "1.8.3"
 # Link "Raw" dẫn đến file version.json trên GitHub của bạn
 UPDATE_URL = "https://raw.githubusercontent.com/auhsuai/Word-Pro/main/version.json"
 
@@ -56,6 +55,7 @@ class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, Dialogs
         self.timer_id = None
         self.mode = "words" # words or sentences
         self.difficulty = "Vừa" # Dễ, Vừa, Khó
+        self.topic = "Tất cả" # Chủ đề từ vựng
         self.selected_sentence_option = "Ngẫu nhiên"
         
         self.target_words = [] # List of target words
@@ -187,6 +187,12 @@ class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, Dialogs
                                                    font=ctk.CTkFont(size=16))
         self.mode_selector.set("Từ ngẫu nhiên")
         self.mode_selector.pack(side="left", padx=5)
+
+        # Topic Dropdown (for random words mode)
+        self.topic_dropdown = ctk.CTkOptionMenu(self.ctrl_subframe, values=["Tất cả", "Công nghệ & Khoa học", "Thiên nhiên & Địa lý", "Động thực vật & Ẩm thực", "Cảm xúc & Con người", "Đời sống & Đồ vật"],
+                                                command=self.change_topic, width=200, height=45,
+                                                font=ctk.CTkFont(size=14))
+        self.topic_dropdown.pack(side="left", padx=5)
 
         self.sentence_dropdown = ctk.CTkOptionMenu(self.ctrl_subframe, values=["Ngẫu nhiên", "Xáo trộn tất cả"],
                                                    command=self.change_sentence_selection, width=200, height=45,
@@ -361,6 +367,11 @@ class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, Dialogs
             # Save to self for use in load_new_text
             self.custom_file_words = words
             self.mode = "file"
+            
+            # Hide selectors that are not relevant
+            self.sentence_dropdown.pack_forget()
+            self.topic_dropdown.pack_forget()
+            self.add_btn.grid_remove()
 
             # Reset test with new word list
             self.reset_test()
@@ -381,17 +392,28 @@ class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, Dialogs
         self.open_file_btn.configure(fg_color="#4b5563") # Reset file btn highlight
         if self.mode == "sentences":
             self.sentence_dropdown.pack(side="left", padx=5)
+            self.topic_dropdown.pack_forget()
             self.difficulty_selector.grid_remove()
             self.add_btn.grid()
             self.update_sentence_dropdown()
-        else:
+        elif self.mode == "words":
             self.sentence_dropdown.pack_forget()
+            self.topic_dropdown.pack(side="left", padx=5)
+            self.difficulty_selector.grid()
+            self.add_btn.grid_remove()
+        else: # mistakes
+            self.sentence_dropdown.pack_forget()
+            self.topic_dropdown.pack_forget()
             self.difficulty_selector.grid()
             self.add_btn.grid_remove()
         self.reset_test()
 
     def change_difficulty(self, value):
         self.difficulty = value
+        self.reset_test()
+
+    def change_topic(self, value):
+        self.topic = value
         self.reset_test()
 
     def change_sentence_selection(self, value):

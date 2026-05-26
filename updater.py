@@ -32,12 +32,10 @@ class UpdaterMixin:
                     if hasattr(self, 'show_update_popup'):
                         self.show_update_popup(remote_version, download_url, changelog)
                 elif manual:
-                    from tkinter import messagebox
-                    messagebox.showinfo("Cập nhật", f"Bạn đang dùng bản mới nhất (v{VERSION}).")
+                    self.show_message_dialog("Cập nhật", f"Bạn đang dùng bản mới nhất (v{VERSION}).")
         except Exception as e:
             if manual:
-                from tkinter import messagebox
-                messagebox.showerror("Lỗi", f"Không thể kết nối máy chủ: {e}")
+                self.show_message_dialog("Lỗi", f"Không thể kết nối máy chủ: {e}", is_error=True)
 
     def start_smart_update(self, url, dialog_window):
         thread = threading.Thread(target=self._download_thread, args=(url, dialog_window))

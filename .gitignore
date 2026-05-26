@@ -8,3 +8,8 @@ unins000.*
 user_stats.json
 custom_sentences.json
 *.spec
+_internal/
+build_all.bat
+release.py
+setup.iss
+WordPro_Setup.exe

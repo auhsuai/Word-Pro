@@ -16,12 +16,12 @@ class LogicMixin:
                 self.show_custom_dialog("Thông báo", "Bạn chưa có từ nào gõ sai để luyện tập!\nHãy luyện tập các chế độ khác trước.")
                 self.mode_selector.set("Từ ngẫu nhiên")
                 self.mode = "words"
-                self.target_text = get_random_words(200, difficulty=self.difficulty)
+                self.target_text = get_random_words(200, difficulty=self.difficulty, topic=self.topic)
             else:
                 random.shuffle(words)
                 self.target_text = " ".join(words)
         elif self.mode == "words":
-            self.target_text = get_random_words(200, difficulty=self.difficulty)
+            self.target_text = get_random_words(200, difficulty=self.difficulty, topic=self.topic)
         else:
             sentences = get_all_sentences()
             if self.selected_sentence_option == "Ngẫu nhiên":

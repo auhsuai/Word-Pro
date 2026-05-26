@@ -13,7 +13,8 @@ class DialogsMixin:
         dialog.title(title)
         dialog.geometry("550x400")
         dialog.resizable(False, False)
-        dialog.attributes("-topmost", True)
+        dialog.transient(self)
+        # Modeless dialog - do not grab_set
         
         screen_width = dialog.winfo_screenwidth()
         screen_height = dialog.winfo_screenheight()
@@ -44,7 +45,8 @@ class DialogsMixin:
         dialog.title("Hệ thống cập nhật tự động")
         dialog.geometry("500x420")
         dialog.resizable(False, False)
-        dialog.attributes("-topmost", True)
+        dialog.transient(self)
+        dialog.grab_set()
         
         screen_width = dialog.winfo_screenwidth()
         screen_height = dialog.winfo_screenheight()
@@ -119,6 +121,8 @@ class DialogsMixin:
         dialog.title("Lịch sử luyện tập")
         dialog.geometry("750x600")
         dialog.resizable(True, True)
+        dialog.transient(self)
+        # Modeless dialog - do not grab_set
         sw, sh = dialog.winfo_screenwidth(), dialog.winfo_screenheight()
         dialog.geometry(f"750x600+{int(sw/2-375)}+{int(sh/2-300)}")
         dialog.configure(fg_color="#2b2b2b")
@@ -312,23 +316,23 @@ class DialogsMixin:
                     f.write("STT,Ngày & Giờ,Tốc độ (WPM),Độ chính xác (%)\n")
                     for i, s in enumerate(history, 1):
                         f.write(f"{i},{s.get('date','')},{s.get('wpm',0)},{s.get('acc',0):.1f}\n")
-                from tkinter import messagebox
-                messagebox.showinfo("Xuất thành công",
-                                    f"Xuất {len(history)} phiên ra file:\n{path}")
+                self.show_message_dialog("Xuất thành công", f"Xuất {len(history)} phiên ra file:\n{path}")
             except Exception as e:
-                from tkinter import messagebox
-                messagebox.showerror("Lỗi", str(e))
+                self.show_message_dialog("Lỗi", str(e), is_error=True)
 
         def clear_history():
-            from tkinter import messagebox
-            if messagebox.askyesno("Xóa lịch sử",
-                    "Bạn có chắc muốn xóa TOÀN BỘ lịch sử không?\nKhông thể hoàn tác!"):
+            def do_clear():
                 from data import save_user_stats
                 stats["history"] = []
                 save_user_stats(stats)
                 history.clear()
                 populate([])
                 total_label.configure(text="Tổng: 0 phiên")
+            self.show_confirm_dialog(
+                "Xóa lịch sử",
+                "Bạn có chắc muốn xóa TOÀN BỘ lịch sử không?\nKhông thể hoàn tác!",
+                do_clear
+            )
 
         ctk.CTkButton(btn_frame, text="Xuất ra CSV (Excel)", command=export_csv,
                       fg_color="#3b82f6", hover_color="#2563eb", height=36, width=180,
@@ -389,3 +393,74 @@ class DialogsMixin:
             from data import add_custom_sentence
             add_custom_sentence(new_sentence)
             self.show_overlay("Đã thêm câu mới thành công!")
+
+    def show_message_dialog(self, title, content, is_error=False):
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(title)
+        dialog.geometry("450x220")
+        dialog.resizable(False, False)
+        dialog.transient(self)
+        dialog.grab_set()
+        
+        sw = dialog.winfo_screenwidth()
+        sh = dialog.winfo_screenheight()
+        x = (sw / 2) - (450 / 2)
+        y = (sh / 2) - (220 / 2)
+        dialog.geometry(f"450x220+{int(x)}+{int(y)}")
+        dialog.configure(fg_color="#2b2b2b")
+        
+        frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        frame.pack(expand=True, fill="both", padx=25, pady=20)
+        
+        title_color = "#ef4444" if is_error else "#3b82f6"
+        lbl_title = ctk.CTkLabel(frame, text=title.upper(), font=ctk.CTkFont(size=16, weight="bold"), text_color=title_color)
+        lbl_title.pack(pady=(0, 10))
+        
+        lbl_content = ctk.CTkLabel(frame, text=content, font=ctk.CTkFont(size=13), text_color="#d1d5db", wraplength=400)
+        lbl_content.pack(expand=True, fill="both", pady=(0, 15))
+        
+        btn = ctk.CTkButton(dialog, text="ĐỒNG Ý", command=dialog.destroy,
+                            width=100, height=32, fg_color=title_color, hover_color="#2563eb" if not is_error else "#dc2626",
+                            font=ctk.CTkFont(weight="bold"))
+        btn.pack(pady=(0, 15))
+
+    def show_confirm_dialog(self, title, content, on_confirm):
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(title)
+        dialog.geometry("450x220")
+        dialog.resizable(False, False)
+        dialog.transient(self)
+        dialog.grab_set()
+        
+        sw = dialog.winfo_screenwidth()
+        sh = dialog.winfo_screenheight()
+        x = (sw / 2) - (450 / 2)
+        y = (sh / 2) - (220 / 2)
+        dialog.geometry(f"450x220+{int(x)}+{int(y)}")
+        dialog.configure(fg_color="#2b2b2b")
+        
+        frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        frame.pack(expand=True, fill="both", padx=25, pady=20)
+        
+        lbl_title = ctk.CTkLabel(frame, text=title.upper(), font=ctk.CTkFont(size=16, weight="bold"), text_color="#fbbf24")
+        lbl_title.pack(pady=(0, 10))
+        
+        lbl_content = ctk.CTkLabel(frame, text=content, font=ctk.CTkFont(size=13), text_color="#d1d5db", wraplength=400)
+        lbl_content.pack(expand=True, fill="both", pady=(0, 15))
+        
+        btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        btn_frame.pack(pady=(0, 15))
+        
+        def handle_confirm():
+            dialog.destroy()
+            on_confirm()
+            
+        yes_btn = ctk.CTkButton(btn_frame, text="ĐỒNG Ý", command=handle_confirm,
+                                 fg_color="#ef4444", hover_color="#dc2626", width=100, height=32,
+                                 font=ctk.CTkFont(weight="bold"))
+        yes_btn.pack(side="left", padx=10)
+        
+        no_btn = ctk.CTkButton(btn_frame, text="HỦY BỎ", command=dialog.destroy,
+                               fg_color="#4b5563", hover_color="#374151", width=100, height=32,
+                               font=ctk.CTkFont(weight="bold"))
+        no_btn.pack(side="left", padx=10)
