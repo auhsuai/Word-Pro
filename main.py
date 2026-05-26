@@ -23,13 +23,17 @@ from updater import UpdaterMixin
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-VERSION = "1.8.3"
+VERSION = "1.9.0"
 # Link "Raw" dẫn đến file version.json trên GitHub của bạn
 UPDATE_URL = "https://raw.githubusercontent.com/auhsuai/Word-Pro/main/version.json"
 
 class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, DialogsMixin, UpdaterMixin):
     def __init__(self):
         super().__init__()
+
+        # Lưu version để các mixin truy cập mà không cần circular import
+        self.phien_ban = VERSION
+        self.duong_dan_cap_nhat = UPDATE_URL
 
         self.title(f"Word Pro v{VERSION} - Luyện gõ tiếng Việt")
         self.geometry("1100x750")
@@ -267,7 +271,7 @@ class WordProApp(ctk.CTk, AudioMixin, GraphMixin, AuthMixin, LogicMixin, Dialogs
         self.control_frame.grid(row=5, column=0, pady=(20, 0))
         self.control_frame.grid_remove() # Hide the bottom frame entirely
 
-        self.ime_toast = ctk.CTkLabel(self.main_container, text="⚠️ Hình như bạn chưa bật bộ gõ tiếng Việt?", 
+        self.ime_toast = ctk.CTkLabel(self.main_container, text="Hình như bạn chưa bật bộ gõ tiếng Việt?", 
                                      font=ctk.CTkFont(size=14, weight="bold"), text_color="#facc15")
         self.ime_toast.grid(row=6, column=0, pady=10)
         self.ime_toast.grid_remove()

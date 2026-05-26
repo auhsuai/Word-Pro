@@ -135,16 +135,16 @@ class LogicMixin:
         # Ghi nhận thời gian gõ cuối để kiểm tra inactivity
         self.last_type_time = time.time()
         
-        # Cảnh báo bộ gõ (IME Warning) nếu gõ liên tiếp các ký tự báo dấu Telex/VNI mà không ra chữ Việt
-        if any(seq in new_content.lower() for seq in ["aw", "aa", "ee", "oo", "ow", "uw", "dd", "as", "af", "ax", "ar", "aj"]):
+        # Cảnh báo bộ gõ (IME Warning): chỉ cảnh báo khi có chuỗi Telex thô VÀ không có ký tự Việt
+        co_telex_tho = any(seq in new_content.lower() for seq in ["aw", "aa", "ee", "oo", "ow", "uw", "dd", "as", "af", "ax", "ar", "aj"])
+        co_ky_tu_viet = any(ord(c) > 127 for c in new_content)
+        if co_telex_tho and not co_ky_tu_viet:
             self.consecutive_ime_errors = getattr(self, "consecutive_ime_errors", 0) + 1
-            if self.consecutive_ime_errors >= 2:
+            if self.consecutive_ime_errors >= 3:
                 if hasattr(self, "ime_toast"): self.ime_toast.grid()
                 self.ime_warning_active = True
-        else:
-            # Nếu có gõ ký tự có dấu (Unicode), reset cảnh báo bộ gõ
-            if any(ord(c) > 127 for c in new_content):
-                self.reset_ime_warning()
+        elif co_ky_tu_viet:
+            self.reset_ime_warning()
             
         # Âm thanh khi gõ (Chỉ kêu khi có thêm ký tự mới)
         if len(new_content) > len(self.current_typed):

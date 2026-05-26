@@ -355,8 +355,7 @@ class DialogsMixin:
         self.show_custom_dialog("Danh sách phím tắt", shortcuts)
 
     def show_about(self):
-        try: from main import VERSION
-        except: VERSION = "1.7.0"
+        VERSION = getattr(self, 'phien_ban', '1.8.3')
         about_text = f"Word Pro - Phiên bản {VERSION}\n..."
         self.show_custom_dialog("Về Word Pro", about_text)
 

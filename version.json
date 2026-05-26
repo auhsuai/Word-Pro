@@ -1,5 +1,5 @@
 {
-  "version": "1.8.3",
-  "download_url": "https://github.com/auhsuai/Word-Pro/releases/download/v1.8.3/WordPro_Setup.exe",
-  "changelog": "Reorganize vocabulary library with static precise dictionaries"
+  "version": "1.9.0",
+  "download_url": "https://github.com/auhsuai/Word-Pro/releases/download/v1.9.0/WordPro_Setup.exe",
+  "changelog": "Bug fix: semantic version comparison, APPDATA writable paths, thread-safe GUI, IME warning fix, installer fallback, remove dead code & ttkbootstrap bloat"
 }
